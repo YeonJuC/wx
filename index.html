@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>바로가기 모음</title>
+  <style>
+    :root { --gap: 14px; --radius: 14px; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, "Malgun Gothic", sans-serif;
+      display: grid; place-items: center; background: #f7f7fb; color: #222;
+    }
+    .wrap { width: min(560px, 92vw); padding: 28px; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    h1 { font-size: 20px; margin: 0 0 18px; }
+    p.desc { margin: 0 0 18px; color: #666; font-size: 14px; }
+    .links { display: grid; gap: var(--gap); }
+    a.link {
+      display: block; padding: 16px 18px; border-radius: var(--radius);
+      text-decoration: none; border: 1px solid #e7e7ee; background: #fafafe;
+      transition: transform .03s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      font-weight: 600; text-align: center;
+    }
+    a.link:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+    a.link:hover { background: #ffffff; border-color: #dcdce6; box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-1px); }
+    small { display: block; margin-top: 6px; color: #888; font-weight: 400; word-break: break-all; }
+    footer { margin-top: 18px; font-size: 12px; color: #8a8a98; text-align: center; }
+  </style>
+  <script>
+    // 옵션: ?goto=1|2|3 로 접속 시 해당 링크로 바로 이동
+    const map = {
+      1: "https://hrdkdh.github.io/wx_team_leader/index.html",
+      2: "https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do",
+      3: "https://chatgpt.com/"
+    };
+    const u = new URL(location.href);
+    const goto = u.searchParams.get("goto");
+    if (goto && map[goto]) location.replace(map[goto]);
+  </script>
+</head>
+<body>
+  <main class="wrap" role="main" aria-labelledby="title">
+    <h1 id="title">바로가기</h1>
+    <p class="desc">아래 버튼을 눌러 이동하세요.</p>
+    <div class="links" role="list">
+      <a class="link" role="listitem" href="https://hrdkdh.github.io/wx_team_leader/index.html" target="_blank" rel="noopener noreferrer">
+        WX 프롬프트 링크
+        <small>https://hrdkdh.github.io/wx_team_leader/index.html</small>
+      </a>
+      <a class="link" role="listitem" href="https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do" target="_blank" rel="noopener noreferrer">
+        POSCO 러닝플랫폼
+        <small>https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do</small>
+      </a>
+      <a class="link" role="listitem" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">
+        ChatGPT
+        <small>https://chatgpt.com/</small>
+      </a>
+    </div>
+    <footer>© 링크 모음</footer>
+  </main>
+</body>
+</html>
