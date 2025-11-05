@@ -1,63 +1,167 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>바로가기 모음</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>바로가기 + AutoLogin 도구</title>
   <style>
-    :root { --gap: 14px; --radius: 14px; }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, "Malgun Gothic", sans-serif;
-      display: grid; place-items: center; background: #f7f7fb; color: #222;
-    }
-    .wrap { width: min(560px, 92vw); padding: 28px; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    h1 { font-size: 20px; margin: 0 0 18px; }
-    p.desc { margin: 0 0 18px; color: #666; font-size: 14px; }
-    .links { display: grid; gap: var(--gap); }
-    a.link {
-      display: block; padding: 16px 18px; border-radius: var(--radius);
-      text-decoration: none; border: 1px solid #e7e7ee; background: #fafafe;
-      transition: transform .03s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
-      font-weight: 600; text-align: center;
-    }
-    a.link:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
-    a.link:hover { background: #ffffff; border-color: #dcdce6; box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-1px); }
-    small { display: block; margin-top: 6px; color: #888; font-weight: 400; word-break: break-all; }
-    footer { margin-top: 18px; font-size: 12px; color: #8a8a98; text-align: center; }
+    :root{--gap:12px;--radius:10px}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR";margin:0;background:#f6f7fb;color:#222;display:grid;place-items:center;height:100vh}
+    .wrap{width:min(680px,94vw);background:#fff;padding:22px;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.08)}
+    h1{margin:0 0 8px;font-size:20px}
+    p{margin:0 0 12px;color:#666}
+    .row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+    input[type="text"]{flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6ee}
+    button{padding:10px 12px;border-radius:8px;border:0;background:#2b6ef6;color:#fff;font-weight:600;cursor:pointer}
+    button.secondary{background:#5b5f6b}
+    .links{display:grid;gap:10px;margin-top:12px}
+    a.link{display:block;padding:12px;border-radius:10px;text-decoration:none;border:1px solid #eee;background:#fafbff;color:#111;font-weight:600}
+    pre{background:#f3f4f8;padding:10px;border-radius:8px;overflow:auto;font-size:12px}
+    .notice{font-size:13px;color:#b02a2a;margin-top:8px}
+    footer{margin-top:14px;color:#888;font-size:13px;text-align:center}
   </style>
-  <script>
-    // 옵션: ?goto=1|2|3 로 접속 시 해당 링크로 바로 이동
-    const map = {
-      1: "https://hrdkdh.github.io/wx_team_leader/index.html",
-      2: "https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do",
-      3: "https://chatgpt.com/"
-    };
-    const u = new URL(location.href);
-    const goto = u.searchParams.get("goto");
-    if (goto && map[goto]) location.replace(map[goto]);
-  </script>
 </head>
 <body>
   <main class="wrap" role="main" aria-labelledby="title">
-    <h1 id="title">바로가기</h1>
-    <p class="desc">아래 버튼을 눌러 이동하세요.</p>
-    <div class="links" role="list">
-      <a class="link" role="listitem" href="https://hrdkdh.github.io/wx_team_leader/index.html" target="_blank" rel="noopener noreferrer">
-        WX 프롬프트 링크
-        <small>https://hrdkdh.github.io/wx_team_leader/index.html</small>
-      </a>
-      <a class="link" role="listitem" href="https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do" target="_blank" rel="noopener noreferrer">
-        POSCO 러닝플랫폼
-        <small>https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do</small>
-      </a>
-      <a class="link" role="listitem" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">
-        ChatGPT
-        <small>https://chatgpt.com/</small>
-      </a>
+    <h1 id="title">바로가기 & 자동 로그인 도구</h1>
+    <p>숫자(예: 1234)를 입력하면 `wx{숫자}@wxgpt.kr` 형식의 아이디를 만들고, 비밀번호는 <code>poscohrd0202</code>로 자동 채우는 도구를 제공합니다.</p>
+
+    <div class="row">
+      <input id="numInput" type="text" placeholder="로그인에 사용할 숫자를 입력하세요 (예: 1234)" />
+      <button id="genBookmarklet">북마클릿 복사</button>
+      <button id="copyUserscript" class="secondary">Tampermonkey 스크립트 복사</button>
     </div>
-    <footer>© 링크 모음</footer>
+
+    <div class="row">
+      <button id="openPosco">POSCO 로그인 페이지 열기 (자동 파라미터 포함)</button>
+      <button id="openChatgpt" class="secondary">ChatGPT 열기</button>
+    </div>
+
+    <div class="links" role="list">
+      <a class="link" href="https://hrdkdh.github.io/wx_team_leader/index.html" target="_blank" rel="noopener noreferrer">WX 팀리더 페이지</a>
+      <a class="link" id="poscoLink" href="https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do" target="_blank" rel="noopener noreferrer">POSCO 로그인 (원본)</a>
+      <a class="link" id="chatgptLink" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT</a>
+    </div>
+
+    <section style="margin-top:12px">
+      <strong>사용 방법 요약</strong>
+      <ol style="margin-top:6px">
+        <li>숫자 입력 → <em>북마클릿 복사</em> 클릭 → 브라우저 북마크바에 새 북마크로 붙여넣기.</li>
+        <li>로그인할 때 POSCO 로그인 페이지를 연 뒤(로그인 폼 보이는 상태) 북마클릿 클릭 → 자동 입력/로그인 시도.</li>
+        <li>또는 Tampermonkey에 스크립트를 설치하면, <code>https://lp.posco.co.kr/.../loginForm.do?wxnum=123</code> 와 같이 열 때 자동으로 채워짐.</li>
+      </ol>
+      <div class="notice">⚠️ 보안 주의: 비밀번호가 자동으로 삽입됩니다. 공용 PC에서는 사용하지 마세요.</div>
+    </section>
+
+    <section style="margin-top:12px">
+      <details>
+        <summary style="cursor:pointer;padding:8px;background:#fafafa;border-radius:8px">북마클릿 (자체 생성) — 코드 미리보기</summary>
+        <pre id="bookmarkletPreview">// 북마클릿은 자동으로 아이디/비번을 채우고 로그인 버튼을 누름 (사이트 마크업에 따라 동작 안 할 수 있음)</pre>
+      </details>
+
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;padding:8px;background:#fafafa;border-radius:8px">Tampermonkey 스크립트 (복사해서 확장에 붙여넣기)</summary>
+        <pre id="userscriptPreview">// Tampermonkey 스크립트 예시 — 복사해서 Tampermonkey에 붙여넣고 활성화하세요.</pre>
+      </details>
+    </section>
+
+    <footer>© 링크 모음 — 자동 로그인 도구 사용 시 보안 주의</footer>
   </main>
+
+  <script>
+    // 기본 값 (원하면 바꿔쓰세요)
+    const DEFAULT_PWD = 'poscohrd0202';
+    const POSCO_LOGIN_URL = 'https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do';
+
+    const numInput = document.getElementById('numInput');
+    const genBookmarkletBtn = document.getElementById('genBookmarklet');
+    const copyUserscriptBtn = document.getElementById('copyUserscript');
+    const bookmarkletPreview = document.getElementById('bookmarkletPreview');
+    const userscriptPreview = document.getElementById('userscriptPreview');
+    const openPoscoBtn = document.getElementById('openPosco');
+    const openChatgptBtn = document.getElementById('openChatgpt');
+
+    function makeEmail(num){ return 'wx' + num + '@wxgpt.kr'; }
+
+    // 북마클릿 문자열 생성 (숫자를 미리 넣어서 생성 가능)
+    function createBookmarkletTemplate(num){
+      // 북마클릿: 현재 페이지(로그인 페이지)에서 실행해야 동작.
+      const email = makeEmail(num || '${num}');
+      const pwd = DEFAULT_PWD;
+      const code = `(function(){try{var email='${email}';var pwd='${pwd}';var emailField=document.querySelector('input[type=\"email\"], input[name=\"email\"], input#email, input[name=\"userid\"], input[name=\"id\"], input[name=\"loginId\"], input[name=\"userId\"]');var passField=document.querySelector('input[type=\"password\"], input[name=\"pwd\"], input[name=\"pass\"], input[name=\"password\"]'); if(emailField){emailField.focus();emailField.value=email;emailField.dispatchEvent(new Event('input',{bubbles:true}));} if(passField){passField.focus();passField.value=pwd;passField.dispatchEvent(new Event('input',{bubbles:true}));} var submitBtn=document.querySelector('button[type=\"submit\"], input[type=\"submit\"], button.login, button.btn-login, button:contains(\"로그인\")'); if(submitBtn){ submitBtn.click(); } else { alert('자동입력 완료. 로그인 버튼을 눌러주세요.'); } }catch(e){alert('오류:'+e.message);} })();`;
+      // url-encode는 브라우저가 처리해주지만 안전하게 encode
+      return 'javascript:' + encodeURIComponent(code);
+    }
+
+    // Tampermonkey 스크립트 (자동 제출 포함)
+    function createUserscriptTemplate(){
+      return `// ==UserScript==
+// @name         POSCO AutoLogin (wx)
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  Open login page with ?wxnum=123 to auto-fill wx{num}@wxgpt.kr and submit.
+// @match        https://lp.posco.co.kr/S22/S22A10/member/login/loginForm.do*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+    // 읽어오기: URL에 ?wxnum=123 형태로 전달
+    function getParam(name){const u=new URL(location.href); return u.searchParams.get(name);}
+    const num = getParam('wxnum');
+    if(!num) return; // 숫자가 없으면 동작 안 함
+    const email = 'wx' + num + '@wxgpt.kr';
+    const pwd = '${DEFAULT_PWD}';
+
+    // 페이지 마크업에 따라 선택자 조정이 필요할 수 있음
+    const emailField = document.querySelector('input[type=\"email\"], input[name=\"email\"], input#email, input[name=\"userid\"], input[name=\"id\"], input[name=\"loginId\"], input[name=\"userId\"]');
+    const passField  = document.querySelector('input[type=\"password\"], input[name=\"pwd\"], input[name=\"pass\"], input[name=\"password\"]');
+
+    if(emailField){ emailField.focus(); emailField.value = email; emailField.dispatchEvent(new Event('input',{bubbles:true})); }
+    if(passField){ passField.focus(); passField.value = pwd; passField.dispatchEvent(new Event('input',{bubbles:true})); }
+
+    // 로그인 버튼 클릭 시도
+    const submitBtn = document.querySelector('button[type=\"submit\"], input[type=\"submit\"], button.login, button.btn-login');
+    if(submitBtn){ submitBtn.click(); }
+    else { console.log('AutoFill: form filled but submit button not found.'); }
+})();`;
+    }
+
+    // 버튼 동작
+    genBookmarkletBtn.addEventListener('click', ()=>{
+      const num = numInput.value.trim();
+      if(!num){ alert('숫자를 입력하세요.'); numInput.focus(); return; }
+      const bm = createBookmarkletTemplate(num);
+      // 북마클릿 복사 (호환 안 되는 브라우저 있을 수 있음)
+      navigator.clipboard.writeText(bm).then(()=>{
+        alert('북마클릿 코드가 클립보드에 복사되었습니다.\n북마크에 새 항목을 만들고 URL에 붙여넣으세요.');
+      }, ()=>{ prompt('클립보드 복사 실패. 아래 코드를 수동으로 복사하세요:', bm); });
+      bookmarkletPreview.textContent = decodeURIComponent(bm);
+    });
+
+    copyUserscriptBtn.addEventListener('click', ()=>{
+      const script = createUserscriptTemplate();
+      navigator.clipboard.writeText(script).then(()=>{
+        alert('Tampermonkey 스크립트가 클립보드에 복사되었습니다.\nTampermonkey에서 새 스크립트로 붙여넣고 저장하세요.');
+      }, ()=>{ prompt('클립보드 복사 실패. 아래 코드를 수동으로 복사하세요:', script); });
+      userscriptPreview.textContent = script;
+    });
+
+    // POSCO 로그인 페이지를 ?wxnum=123 형태로 열기
+    openPoscoBtn.addEventListener('click', ()=>{
+      const num = numInput.value.trim();
+      if(!num){ alert('숫자를 입력하세요.'); numInput.focus(); return; }
+      const url = POSCO_LOGIN_URL + '?wxnum=' + encodeURIComponent(num);
+      window.open(url, '_blank');
+    });
+
+    // ChatGPT 열기
+    openChatgptBtn.addEventListener('click', ()=> window.open('https://chatgpt.com/', '_blank'));
+
+    // 미리보기 기본값 세팅
+    bookmarkletPreview.textContent = decodeURIComponent(createBookmarkletTemplate('1234'));
+    userscriptPreview.textContent = createUserscriptTemplate();
+  </script>
 </body>
 </html>
